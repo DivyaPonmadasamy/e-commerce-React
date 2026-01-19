@@ -1,0 +1,2 @@
+- “Frontend runs in Node.js service”
+- “Backend runs in Docker service with Java 21”

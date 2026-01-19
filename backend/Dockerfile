@@ -9,6 +9,7 @@ COPY . .
 
 # Build the app
 RUN ./mvnw clean package -DskipTests
+RUN cp target/*.jar app.jar
 
 # Run the app
-CMD ["java", "-jar", "target/*.jar"]
+CMD ["java", "-jar", "app.jar"]

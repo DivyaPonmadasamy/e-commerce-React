@@ -1,0 +1,66 @@
+.aside {
+    position: fixed;
+    top: 90px;
+    left: 0;
+    width: 225px;
+    height: calc(100vh - 80px);
+    padding: 10px;
+    padding-top: 0;
+    background: #f9f9f9;
+    border-right: 1px solid rgba(00, 00, 00, 0.2);
+    overflow-y: auto;
+    z-index: 49;
+}
+
+p {
+    margin: 11px 0 11px 5px;
+    cursor: pointer;
+}
+
+.sec {
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(00, 00, 00, 0.2);
+}
+
+.aside .mar-t-0 {
+    margin-top: 0;
+}
+
+.aside h3 {
+    background-color: #eeeeee;
+    padding: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    margin: 10px -10px;
+    color: purple;
+}
+
+.chkbox,
+.radio {
+    margin: 12px 0;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #6a1b9a;
+    display: inline-block;
+}
+
+input[type="checkbox"] {
+    vertical-align: top;
+}
+
+input[type="radio"] {
+    vertical-align: bottom;
+}
+
+.aside .sec:first-child h3+p {
+    text-decoration: underline;
+}
+
+.active {
+    color: rgba(167, 15, 167, 0.847);
+}

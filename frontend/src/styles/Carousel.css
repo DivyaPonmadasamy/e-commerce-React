@@ -1,0 +1,40 @@
+.footer-carousel {
+    min-width: 1200px;
+    max-width: 1200px;
+    margin-left: 285px;
+    /* overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    display: flex; */
+}
+
+img {
+    width: 100%;
+    border-radius: 20px;
+}
+
+/* .slick-dots li button {
+    width: 40px !important;
+    height: 40px !important;
+    color: white !important;
+} */
+
+.slick-dots {
+    display: flex !important;
+    position: relative !important;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    bottom: 10px !important;
+    max-width: 90px !important;
+    /* max-width: 120px !important; */
+    margin: -25px auto  25px auto !important;
+}
+
+/* 
+.carousel-track {
+    display: flex;
+}
+
+.carousel-item {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+} */

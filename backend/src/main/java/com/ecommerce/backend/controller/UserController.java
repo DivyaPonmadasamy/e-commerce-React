@@ -94,13 +94,15 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(HttpServletResponse response) {
+    public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
+        boolean isHttps = request.isSecure(); // check if dev/prod environment
+
         ResponseCookie cookie = ResponseCookie.from("token", "")
                 .httpOnly(true)
-                .secure(false) // set for https requests
+                .secure(isHttps) // set to false for local dev if needed
+                .sameSite(isHttps ? "None" : "Lax")
                 .path("/")
                 .maxAge(0) // expire immediately
-                .sameSite("Lax")
                 .build();
 
         response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());

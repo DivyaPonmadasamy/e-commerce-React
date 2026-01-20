@@ -14,7 +14,7 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
+    private static final String SECRET_KEY = "5367566859703373367639792F423F452848284D6251655468576D5A71347439"; //37 -> 39
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());

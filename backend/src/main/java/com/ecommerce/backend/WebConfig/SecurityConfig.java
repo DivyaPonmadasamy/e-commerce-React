@@ -13,6 +13,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,7 +33,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/getallproducts",
+                        .requestMatchers("/login", "/register", "/getallproducts", "/cart",
                                 "/validatetoken", "/validatetoken**", "/saveuser", "/products/**", "/getallcategories")
                         .permitAll()
                         .anyRequest().authenticated())
@@ -43,10 +44,16 @@ public class SecurityConfig {
         // return http.build();
     }
 
+    // Bean-based config
+    @Value("${ALLOWED_ORIGINS}")
+    private String allowedOrigins;
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // frontend origin
+        // frontend origin
+        // config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://relaxed-mermaid-700c70.netlify.app"));
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*")); // allow headers
         config.setAllowCredentials(true); // allow cookies

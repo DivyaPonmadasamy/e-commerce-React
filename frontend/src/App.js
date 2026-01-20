@@ -15,41 +15,42 @@ function App() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // If no token cookie => user is logged out, skip API call
-    const hasToken = document.cookie.includes("token=");
+    // // If no token cookie => user is logged out, skip API call
+    // const hasToken = document.cookie.includes("token=");
 
-    if (!hasToken) {
+    // if (!hasToken) {
+    //   dispatch(setLoggedOut());
+    //   // dispatch(setLoading(false));
+    //   return;
+    // }
+
+  axiosAuth.get("/validatetoken")
+    .then((res) => {
+      dispatch(setUser(res.data));
+      dispatch(setLoggedIn());
+    })
+    .catch((err) => {
+      console.error("Authentication failed. Invalid token.")
       dispatch(setLoggedOut());
-      return;
-    }
+    });
+}, [dispatch]);
 
-    axiosAuth.get("/validatetoken")
-      .then((res) => {
-        dispatch(setUser(res.data));
-        dispatch(setLoggedIn());
-      })
-      .catch((err) => {
-        console.error("Authentication failed. Invalid token.")
-        dispatch(setLoggedOut());
-      });
-  }, [dispatch]);
-
-  return (
-    <div className="App">
-      <Header />
-      <Sidebar />
-      <ProductCard />
-      <ToastContainer position="bottom-left"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={true}
-        closeOnClick
-        pauseOnHover
-      // theme="colored"
-      />
-      <Carousel />
-    </div>
-  );
+return (
+  <div className="App">
+    <Header />
+    <Sidebar />
+    <ProductCard />
+    <ToastContainer position="bottom-left"
+      autoClose={3000}
+      hideProgressBar={false}
+      newestOnTop={true}
+      closeOnClick
+      pauseOnHover
+    // theme="colored"
+    />
+    <Carousel />
+  </div>
+);
 }
 
 export default App;

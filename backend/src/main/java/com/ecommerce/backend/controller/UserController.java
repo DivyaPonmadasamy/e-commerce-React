@@ -3,6 +3,7 @@ package com.ecommerce.backend.controller;
 import org.springframework.http.HttpHeaders;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +67,9 @@ public class UserController {
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-        UserDTO userDTO = new UserDTO(user.getId(), user.getEmail());
-        return ResponseEntity.status(200).body(userDTO);
+        // UserDTO userDTO = new UserDTO(user.getId(), user.getEmail());
+        Map<String, Object> body = Map.of( "id", user.getId(), "email", user.getEmail(), "token", jwtToken );
+        return ResponseEntity.status(200).body(body);
     }
 
     // insert a record (new user)

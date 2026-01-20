@@ -28,19 +28,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    // endpoints we want to skip from filtering (add more if needed)
-    // private static final Set<String> SKIP_PATHS = Set.of(
-    //         "/login",
-    //         "/register",
-    //         "/getallproducts",
-    //         "/validatetoken",
-    //         "/validatetoken**",
-    //         "/validatetoken/**",
-    //         "/saveuser",
-    //         "/products/**",
-    //         "/getallcategories",
-    //         "/cart/**");
-
     @Override
     protected void doFilterInternal(HttpServletRequest request,
             HttpServletResponse response,
@@ -48,12 +35,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // --- 1) skip preflight and explicit public paths ---
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-                // || SKIP_PATHS.stream().anyMatch(path -> request.getRequestURI().startsWith(path))) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // --- 2) extract token from cookie ---
+        // --- 2) try to extract token from cookie ---
         String token = null;
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
@@ -61,6 +47,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     token = cookie.getValue();
                     break;
                 }
+            }
+        }
+
+        // 2) fallback to Authorization header
+        if (token == null) {
+            String authHeader = request.getHeader("Authorization");
+            if (authHeader != null &&
+                    authHeader.startsWith("Bearer ")) {
+                token = authHeader.substring(7);
             }
         }
 
@@ -78,8 +73,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         } catch (Exception ex) {
             // token parsing/validation failed — do not set authentication
-            // Let request continue so controller can return proper response (or you may
-            // choose to send 401 here)
+            // Let request continue so controller can return proper response
         }
 
         filterChain.doFilter(request, response);

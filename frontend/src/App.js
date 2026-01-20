@@ -16,13 +16,12 @@ function App() {
 
   useEffect(() => {
     // If no token cookie => user is logged out, skip API call
-    // const hasToken = document.cookie.includes("token=");
+    const hasToken = document.cookie.includes("token=");
 
-    // if (!hasToken) {
-    //   dispatch(setLoggedOut());
-    //   dispatch(setLoading(false));
-    //   return;
-    // }
+    if (!hasToken) {
+      dispatch(setLoggedOut());
+      return;
+    }
 
     axiosAuth.get("/validatetoken")
       .then((res) => {

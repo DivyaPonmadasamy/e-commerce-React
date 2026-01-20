@@ -58,7 +58,7 @@ export default function WishList(props) {
                                                 <td className='tac b-600'>₹ {calculatePrice(item.mrp, item.discount)}</td>
                                                 <td className='tac save-price'>₹ {calculateSaving(item.mrp, item.discount)}</td>
                                                 <td className='tac'>
-                                                    {/* <button className="add-btn" onClick={() => { props.addToCart(item) }}>Add to Cart</button> */}
+                                                    <button className="add-btn" onClick={() => { props.addToCart(item) }}>Add to Cart</button>
                                                 </td>
                                             </tr>
                                         );

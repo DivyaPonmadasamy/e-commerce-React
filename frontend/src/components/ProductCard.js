@@ -401,17 +401,16 @@ export default function ProductCard() {
 
         // guest user
         if (!userloc?.id) {
-
             const itemInCart = localCart.find(c => c.id === item.id);
-
-            // remove from guest wishlist
-            dispatch(removeFromGuestWishlist(item.id));
-            dispatch(updateWishCount(localGuestWishlist.length - 1));
 
             if (itemInCart) {
                 toast.info("Item already exists in cart");
                 return;
             }
+
+            // remove from guest wishlist
+            dispatch(removeFromGuestWishlist(item.id));
+            dispatch(updateWishCount(localGuestWishlist.length - 1));
 
             // add to guest cart
             dispatch(addToGuestCart({

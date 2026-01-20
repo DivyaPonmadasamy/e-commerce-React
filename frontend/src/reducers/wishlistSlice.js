@@ -14,17 +14,17 @@ try {
 export const wishlistSlice = createSlice({
     name: 'wishlist',
     initialState: {
-        // wishlist: [],
+        wishlist: [],
         guestWishlist: parsedCookieWishList.length ? parsedCookieWishList : [],
     },
     reducers: {
-        // setWishlist: (state, action) => {
-        //     state.wishlist = action.payload;
-        //     state.wishCount = action.payload.length;
-        // },
-        // clearWishlist: (state) => {
-        //     state.wishlist = [];
-        // },
+        setWishlist: (state, action) => {
+            state.wishlist = action.payload;
+            state.wishCount = action.payload.length;
+        },
+        clearWishlist: (state) => {
+            state.wishlist = [];
+        },
         setGuestWishlist: (state, action) => {
             state.guestWishlist = action.payload;
         },

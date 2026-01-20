@@ -1,7 +1,7 @@
 package com.ecommerce.backend.component;
 
 import java.io.IOException;
-import java.util.Set;
+// import java.util.Set;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -29,14 +29,17 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     // endpoints we want to skip from filtering (add more if needed)
-    private static final Set<String> SKIP_PATHS = Set.of(
-            "/login",
-            "/register",
-            "/getallproducts",
-            "/validatetoken",
-            "/saveuser",
-            "/products/**",
-            "/getallcategories");
+    // private static final Set<String> SKIP_PATHS = Set.of(
+    //         "/login",
+    //         "/register",
+    //         "/getallproducts",
+    //         "/validatetoken",
+    //         "/validatetoken**",
+    //         "/validatetoken/**",
+    //         "/saveuser",
+    //         "/products/**",
+    //         "/getallcategories",
+    //         "/cart/**");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -44,8 +47,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             FilterChain filterChain) throws ServletException, IOException {
 
         // --- 1) skip preflight and explicit public paths ---
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())
-                || SKIP_PATHS.stream().anyMatch(path -> request.getRequestURI().startsWith(path))) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+                // || SKIP_PATHS.stream().anyMatch(path -> request.getRequestURI().startsWith(path))) {
             filterChain.doFilter(request, response);
             return;
         }

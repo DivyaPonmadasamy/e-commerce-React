@@ -21,7 +21,7 @@ public class WebConfig {
                 registry.addMapping("/**") // Apply to all paths
                         // .allowedOrigins("http://localhost:3000",
                         // "https://relaxed-mermaid-700c70.netlify.app") // Allowed origins
-                        .allowedOrigins(allowedOrigins)
+                        .allowedOrigins(allowedOrigins.split(","))
                         .allowedMethods("*") // Allowed HTTP methods
                         .allowedHeaders("*") // Allowed headers
                         .allowCredentials(true); // Allow credentials like cookies

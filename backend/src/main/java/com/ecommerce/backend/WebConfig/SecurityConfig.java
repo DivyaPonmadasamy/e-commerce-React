@@ -26,6 +26,9 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
+    @Value("${ALLOWED_ORIGINS}")
+    private String allowedOrigins;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -33,8 +36,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/getallproducts", "/cart",
-                                "/validatetoken", "/validatetoken**", "/saveuser", "/products/**", "/getallcategories")
+                        .requestMatchers("/login", "/register", "/getallproducts", "/cart/**",
+                                "/validatetoken", "/validatetoken**", "/validatetoken/**", "/saveuser", "/products/**", "/getallcategories")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -45,15 +48,12 @@ public class SecurityConfig {
     }
 
     // Bean-based config
-    @Value("${ALLOWED_ORIGINS}")
-    private String allowedOrigins;
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // frontend origin
         // config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://relaxed-mermaid-700c70.netlify.app"));
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins));
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*")); // allow headers
         config.setAllowCredentials(true); // allow cookies

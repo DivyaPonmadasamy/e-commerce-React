@@ -38,7 +38,8 @@ public class UserController {
 
     // validate user when logging in
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest, HttpServletRequest request,
+            HttpServletResponse response) {
         Optional<User> userOpt = userService.getUserByEmail(loginRequest.getEmail());
 
         if (userOpt.isEmpty()) {
@@ -53,12 +54,14 @@ public class UserController {
 
         String jwtToken = jwtService.generateToken(user.getEmail());
 
+        boolean isHttps = request.isSecure(); // check if dev/prod environment
+
         ResponseCookie cookie = ResponseCookie.from("token", jwtToken)
                 .httpOnly(true)
-                .secure(false) // set to false for local dev if needed
+                .secure(isHttps) // set to false for local dev if needed
+                .sameSite(isHttps ? "None" : "Lax")
                 .path("/")
                 .maxAge(Duration.ofDays(7))
-                .sameSite("Lax")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

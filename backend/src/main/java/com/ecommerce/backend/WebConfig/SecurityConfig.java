@@ -36,7 +36,7 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/getallproducts", "/cart/**", "/wishlist/**",
+                        .requestMatchers("/login", "/register", "/getallproducts",
                                 "/validatetoken", "/validatetoken**", "/validatetoken/**", "/saveuser", "/products/**", "/getallcategories")
                         .permitAll()
                         .anyRequest().authenticated())

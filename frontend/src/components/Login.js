@@ -58,8 +58,8 @@ export default function Login() {
         }
     }
 
-    function handleLoginSuccess(userId) {
-        axiosAuth.get(`/cart/${userId}`)
+    function handleLoginSuccess(userid) {
+        axiosAuth.get(`/cart/${userid}`)
             .then(res => {
                 const finalCart = Array.isArray(res.data) ? res.data : [];
                 dispatch(setCart(finalCart));

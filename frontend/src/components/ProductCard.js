@@ -323,14 +323,15 @@ export default function ProductCard() {
     }
 
     function reloadWishList() {
-        if (!userloc?.id) return;
-        axiosAuth.get(`/wishlist/get/${userloc.id}`)
-            .then(res => {
-                setLocalWishlist(res.data);
-                dispatch(setGuestWishlist(res.data));
-                dispatch(updateWishCount(res.data.length));
-            })
-            .catch(err => console.error('reloadWishList failed', err));
+        if (userloc?.id) {
+            axiosAuth.get(`/wishlist/get/${userloc.id}`)
+                .then(res => {
+                    setLocalWishlist(res.data);
+                    dispatch(setGuestWishlist(res.data));
+                    dispatch(updateWishCount(res.data.length));
+                })
+                .catch(err => console.error('reloadWishList failed', err));
+        }
     }
 
     function addToWishList(item) {

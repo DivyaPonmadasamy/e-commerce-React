@@ -427,17 +427,17 @@ export default function ProductCard() {
         }
 
         // logged-in user
-        const existing = localCart.find(c => c.productid === item.id);
+        const existing = localCart.find(c => c.productid === item.productid);
+        if (existing) {
+            toast.info("Item already exists in cart");
+            return;
+        }
 
         // remove from wish_list
         // axiosAuth.delete(`/wishlist/delete/${userloc.id}/${id}`)
         axiosAuth.delete(`/wishlist/remove/${item.id}`)
             .then(() => {
-                if (existing) {
-                    toast.info("Item already exists in cart");
-                    reloadWishList();
-                    return;
-                }
+                reloadWishList();
 
                 // add to cart_item
                 axiosAuth.post('/cart', {

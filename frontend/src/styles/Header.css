@@ -1,11 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@400;700&display=swap'); 
 
 .header {
-    /* padding-top: 7px; */
     position: fixed;
     top: 0;
     width: 100%;
-    background: transparent;
     z-index: 50;
 }
 
@@ -14,13 +12,8 @@
     justify-content: space-between;
     align-items: center;
     background-image: linear-gradient(to right, #ceb9fb, rgb(79, 3, 79));
-    min-width: 1150px;
-    /* max-width: 1365px; */
     padding: 5px 50px;
-    margin: 0 auto;
     height: 80px;
-    box-shadow: 0 4px 40px #00000014;
-    /* border-radius: 50px; */
 }
 
 .groc-name {

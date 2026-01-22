@@ -166,7 +166,7 @@ export default function ProductCard() {
     }
 
     function addToCart(item) {
-        if (item.orderedquantity <= 0) {
+        if (item.orderedquantity == 0) {
             toast.warn("Please select a quantity before adding!");
             return;
         }
@@ -222,8 +222,8 @@ export default function ProductCard() {
                 url: item.url, mrp: item.mrp, discount: item.discount
             }));
 
-            toast.success("Cart updated!");
             dispatch(updateAddMore({ show: false }));
+            toast.success("Cart updated!");
             return;
         }
 
@@ -337,13 +337,6 @@ export default function ProductCard() {
     function addToWishList(item) {
         // guest wishlist
         if (!userloc?.id) {
-            const existing = localGuestWishlist.find(val => val.id === item.id);
-
-            if (existing) {
-                toast.info("Already in wishlist!");
-                return;
-            }
-
             dispatch(addToGuestWishlist({
                 id: item.id,
                 name: item.name,
@@ -351,8 +344,8 @@ export default function ProductCard() {
                 mrp: item.mrp,
                 discount: item.discount
             }));
-            toast.success("Added to wishlist!");
             dispatch(updateWishCount(localGuestWishlist.length + 1));
+            toast.success("Added to wishlist!");
             return;
         }
 
@@ -368,17 +361,17 @@ export default function ProductCard() {
             userid: userloc.id,
             productid: item.id
         }).then(() => {
-            toast.success("Added to wishlist!");
             reloadWishList();
+            toast.success("Added to wishlist!");
         }).catch(err => console.error(err));
     }
 
     function deleteFromWishlist(wishlistId) {
         // guest wishlist
         if (!userloc?.id) {
-            toast.success("Removed from wishlist!");
             dispatch(removeFromGuestWishlist(wishlistId));
             dispatch(updateWishCount(localGuestWishlist.length - 1));
+            toast.success("Removed from wishlist!");
             return;
         }
 
@@ -447,9 +440,9 @@ export default function ProductCard() {
                     quantity: 1
                 })
                     .then(() => {
-                        toast.success("Item added to cart!");
                         reloadWishList();
                         reloadCart();
+                        toast.success("Item added to cart!");
                     })
                     .catch(err => console.error("Add to cart failed", err));
             })
@@ -469,9 +462,9 @@ export default function ProductCard() {
                         return (
                             <div key={category.id} className="category-block wow animate__animated animate__fadeInUp">
                                 <h3 className='category-heading'>{category.name}</h3>
-                                <div className='card wow animate__animated animate__fadeInUp'>
+                                <div className='card-flex wow animate__animated animate__fadeInUp'>
                                     {itemsInCategory.map(item => (
-                                        <div className='section' key={item.id}>
+                                        <div className='card' key={item.id}>
                                             <div className='border rel'>
                                                 <span className='offer abs'>{`${item.discount}% OFF`}</span>
                                                 <img src={item.url} alt={item.name + '.jpeg'} />

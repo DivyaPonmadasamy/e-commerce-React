@@ -52,7 +52,7 @@
     color: purple;
 }
 
-.card {
+.card-flex {
     display: flex;
     flex-wrap: wrap;
     margin: 30px 15px;
@@ -63,7 +63,7 @@ img {
     width: 100%;
 }
 
-.section {
+.card {
     border: 1px solid rgba(00, 00, 00, 0.2);
     border-radius: 10px;
     box-shadow: 5px 5px 5px #c8c8c8;
@@ -74,7 +74,7 @@ img {
     padding: 20px;
 }
 
-.section:hover {
+.card:hover {
     transition: all 0.3s ease-out;
     transform: translateY(-10px);
 }

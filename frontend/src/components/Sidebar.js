@@ -12,7 +12,7 @@ export default function SideBar() {
     const [selectedCategory, setSelectedCategory] = useState();
     const [selectedPriceRanges, setSelectedPriceRanges] = useState([]);
     const [selectedDiscountRange, setSelectedDiscountRange] = useState(null);
-    const [activeIdCat, setActiveIdCat] = useState(null);
+    const [activeIdCat, setActiveIdCat] = useState(0);
     const [activeIdsPri, setActiveIdsPri] = useState([]);
     const [activeIdDis, setActiveIdDis] = useState(null);
 
@@ -139,20 +139,18 @@ export default function SideBar() {
             </div>
             <div className='sec'>
                 <h3>Price</h3>
-                <div>
-                    {chkbox_options.map((option) => (
-                        <div className='chkbox' key={option.id}>
-                            <label className={activeIdsPri.includes(option.id) ? "active" : ""}>
-                                <input
-                                    type="checkbox"
-                                    value={option.id}
-                                    checked={selectedPriceRanges.some(item => item.id === option.id)}
-                                    onChange={(e) => handlePriceChange(e, option)}
-                                /> {option.label}
-                            </label>
-                        </div>
-                    ))}
-                </div>
+                {chkbox_options.map((option) => (
+                    <div className='chkbox' key={option.id}>
+                        <label className={activeIdsPri.includes(option.id) ? "active" : ""}>
+                            <input
+                                type="checkbox"
+                                value={option.id}
+                                checked={selectedPriceRanges.some(item => item.id === option.id)}
+                                onChange={(e) => handlePriceChange(e, option)}
+                            /> {option.label}
+                        </label>
+                    </div>
+                ))}
             </div>
             <div className='sec'>
                 <h3>Discount</h3>

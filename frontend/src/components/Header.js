@@ -20,6 +20,7 @@ import Success from './Success';
 import { axiosAuth } from '../configurations/axiosConfig';
 
 export default function Header() {
+    const inputRef = useRef();
     const badgeRef = useRef();
     const wishRef = useRef();
     const count = useSelector(cartCount);
@@ -32,6 +33,21 @@ export default function Header() {
     const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
+        // Escape key listener for search box
+        const input = inputRef.current;
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                dispatch(clearSearch());
+            }
+        };
+        input.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            input.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [dispatch]);
+
+    useEffect(() => {
         const badge = badgeRef.current;
         if (badge) {
             // Cart count animation
@@ -40,20 +56,11 @@ export default function Header() {
                 badge.classList.remove('animate');
             }, 300);
 
-            // Escape key listener for search box
-            const handleKeyDown = (e) => {
-                if (e.key === 'Escape') {
-                    dispatch(clearSearch());
-                }
-            };
-            window.addEventListener('keydown', handleKeyDown);
-
             return () => {
                 clearTimeout(timer);
-                window.removeEventListener('keydown', handleKeyDown);
             };
         }
-    }, [count, dispatch]);
+    }, [count]);
 
     useEffect(() => {
         const wish = wishRef.current;
@@ -68,7 +75,7 @@ export default function Header() {
                 clearTimeout(timer);
             };
         }
-    }, [wishlistcount, dispatch]);
+    }, [wishlistcount]);
 
     function updateInput(e) {
         dispatch(setSearch(e.target.value));
@@ -98,11 +105,11 @@ export default function Header() {
         <header className='header'>
             <div className='top-menu'>
                 <img className='img-logo bor-rad' src={storeLogo} alt='logo.jpeg' />
-                <h3 className='groc-name wow animate__animated animate__rubberBand'>Grocery Store</h3>
+                <h1 className='groc-name wow animate__animated animate__rubberBand'>Grocery Store</h1>
                 <div className='flex rel'>
-                    <div className='rel'>
+                    <div>
                         <i className="bi bi-search search-icon abs"></i>
-                        <input className='search' name='search' value={input}
+                        <input ref={inputRef} className='search' name='search' value={input}
                             onChange={(e) => updateInput(e)} placeholder='Search for Products...' />
                     </div>
                     {login ? <button className='login' onClick={() => handleLogout()}>

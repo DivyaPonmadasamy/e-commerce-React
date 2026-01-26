@@ -1,6 +1,7 @@
 package com.ecommerce.backend.controller;
 
 import org.springframework.http.HttpHeaders;
+
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -17,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.backend.model.LoginRequest;
 import com.ecommerce.backend.model.User;
 import com.ecommerce.backend.model.UserDTO;
-import com.ecommerce.backend.services.JwtService;
-import com.ecommerce.backend.services.UserService;
+import com.ecommerce.backend.service.JwtService;
+import com.ecommerce.backend.service.UserService;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -47,7 +48,17 @@ public class UserController {
             return ResponseEntity.status(404).body("User not found");
         }
 
-        User user = userOpt.get();
+        User user = userOpt.get();  // unwrapping from Optional to User
+
+        // // or even simpler
+        // User user = userOpt.orElseThrow(
+        // () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        // // functional un-wrapping
+        // return userService.getUserByEmail(loginRequest.getEmail())
+        //         .filter(user -> user.getPassword().equals(loginRequest.getPassword()))
+        //         .map(user -> ResponseEntity.ok("Login successful"))
+        //         .orElse(ResponseEntity.status(401).body("Incorrect email or password"));
 
         if (!user.getPassword().equals(loginRequest.getPassword())) {
             return ResponseEntity.status(401).body("Incorrect password");
@@ -59,7 +70,7 @@ public class UserController {
 
         ResponseCookie cookie = ResponseCookie.from("token", jwtToken)
                 .httpOnly(true)
-                .secure(isHttps) // set to false for local dev if needed
+                .secure(isHttps) // set to false for local dev
                 .sameSite(isHttps ? "None" : "Lax")
                 .path("/")
                 .maxAge(Duration.ofDays(7))
@@ -68,7 +79,9 @@ public class UserController {
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
         // UserDTO userDTO = new UserDTO(user.getId(), user.getEmail());
-        Map<String, Object> body = Map.of( "id", user.getId(), "email", user.getEmail(), "token", jwtToken );
+
+        // sending the token in the body, as third-party might not allow to read from the cookie
+        Map<String, Object> body = Map.of("id", user.getId(), "email", user.getEmail(), "token", jwtToken);
         return ResponseEntity.status(200).body(body);
     }
 

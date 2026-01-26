@@ -12,10 +12,9 @@ import com.ecommerce.backend.model.CartItem;
 public interface CartItemRepo extends JpaRepository<CartItem, Integer> {
     List<CartItem> findByUserId(Integer userid);
 
-    List<CartItem> findByUserIdOrderByCreatedatDesc(Integer userid);
-
-    // Optional<CartItem> findByUserIdAndVegetablesId(Integer userid, Integer vegetableid);
     Optional<CartItem> findByUserIdAndProductId(Integer userid, Integer productid);
+
+    List<CartItem> findByUserIdOrderByCreatedatDesc(Integer userid);
 
     List<CartItem> findByUserIdOrderByUpdatedatDesc(Integer userid);
 

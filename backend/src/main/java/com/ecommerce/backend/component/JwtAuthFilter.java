@@ -1,10 +1,8 @@
 package com.ecommerce.backend.component;
 
 import java.io.IOException;
-// import java.util.Set;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -17,7 +15,7 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import com.ecommerce.backend.services.JwtService;
+import com.ecommerce.backend.service.JwtService;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -41,16 +39,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         // --- 2) try to extract token from cookie ---
         String token = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("token".equals(cookie.getName())) {
-                    token = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        token = jwtService.extractTokenFromCookie(request);
 
-        // 2) fallback to Authorization header
+        // 2.a) fallback to Authorization header for third-party rejection
         if (token == null) {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null &&

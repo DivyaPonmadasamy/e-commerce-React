@@ -18,34 +18,27 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ecommerce.backend.model.CartItem;
 import com.ecommerce.backend.model.CartItemRequest;
 import com.ecommerce.backend.model.CartItemResponse;
-import com.ecommerce.backend.services.CartItemService;
+import com.ecommerce.backend.service.CartItemService;
 
 @RestController
 public class CartItemController {
     @Autowired
     private CartItemService cartItemsService;
 
-    // @GetMapping("/cart/{userid}")
-    // public ResponseEntity<List<CartItem>> getCartItemByUserid(@PathVariable
-    // Integer userid) {
-    // return
-    // ResponseEntity.status(200).body(cartItemsService.getCartItemByUserid(userid));
-    // }
-
     @GetMapping("/cart/{userid}")
-    public ResponseEntity<List<CartItemResponse>> getCartItemByUseridSorted(@PathVariable Integer userid) {
-        List<CartItem> items = cartItemsService.getCartItemByUseridSorted(userid);
-        List<CartItemResponse> response = items.stream().map(item -> new CartItemResponse(
-                item.getId(),
-                item.getQuantity(),
-                item.getProduct().getUnit(),
-                item.getProduct().getName(),
-                item.getProduct().getUrl(),
-                item.getProduct().getMrp(),
-                item.getProduct().getDiscount(),
-                item.getProduct().getId())).collect(Collectors.toList());
-        // return
-        // ResponseEntity.status(200).body(cartItemsService.getCartItemByUseridSorted(userid));
+    public ResponseEntity<List<CartItemResponse>> getCartItemByUserIdSorted(@PathVariable Integer userid) {
+        List<CartItem> items = cartItemsService.getCartItemByUserIdSorted(userid);
+        List<CartItemResponse> response = items.stream()
+                .map(item -> new CartItemResponse(
+                        item.getId(),
+                        item.getQuantity(),
+                        item.getProduct().getUnit(),
+                        item.getProduct().getName(),
+                        item.getProduct().getUrl(),
+                        item.getProduct().getMrp(),
+                        item.getProduct().getDiscount(),
+                        item.getProduct().getId()))
+                .collect(Collectors.toList());
         return ResponseEntity.status(200).body(response);
     }
 
@@ -53,8 +46,8 @@ public class CartItemController {
     @PostMapping("/cart")
     public ResponseEntity<CartItemResponse> addOrUpdateFromMainPage(@RequestBody CartItemRequest req) {
         CartItem item = cartItemsService.addOrUpdateFromMainPage(
-                req.getUserId(),
-                req.getProductId(),
+                req.getUserid(),
+                req.getProductid(),
                 req.getQuantity());
 
         CartItemResponse response = new CartItemResponse(
@@ -66,24 +59,12 @@ public class CartItemController {
                 item.getProduct().getMrp(),
                 item.getProduct().getDiscount(),
                 item.getProduct().getId());
-
         return ResponseEntity.status(200).body(response);
     }
 
     @PutMapping("/cart/inc/{id}")
-    public ResponseEntity<CartItemResponse> increment(@PathVariable Integer id) {
-        CartItem item = cartItemsService.incrementQuantity(id);
-        CartItemResponse response = new CartItemResponse(
-                item.getId(),
-                item.getQuantity(),
-                item.getProduct().getUnit(),
-                item.getProduct().getName(),
-                item.getProduct().getUrl(),
-                item.getProduct().getMrp(),
-                item.getProduct().getDiscount(),
-                item.getProduct().getId());
-
-        return ResponseEntity.status(200).body(response);
+    public ResponseEntity<CartItem> increment(@PathVariable Integer id) {
+        return ResponseEntity.status(200).body(cartItemsService.incrementQuantity(id));
     }
 
     @PutMapping("/cart/dec/{id}")
@@ -92,15 +73,14 @@ public class CartItemController {
     }
 
     @DeleteMapping("/cart/del/{id}")
-    public ResponseEntity<?> delete(@PathVariable Integer id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         cartItemsService.deleteCartItem(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/cart/count/{userId}")
-    public ResponseEntity<Integer> getCartCount(@PathVariable Integer userId) {
-        int count = cartItemsService.getCartCount(userId);
-        return ResponseEntity.status(200).body(count);
+    @GetMapping("/cart/count/{userid}")
+    public ResponseEntity<Integer> getCartCount(@PathVariable Integer userid) {
+        return ResponseEntity.status(200).body(cartItemsService.getCartCount(userid));
     }
 
     @PutMapping("/cart/addmore/{id}")
@@ -120,12 +100,11 @@ public class CartItemController {
         for (CartItemRequest guestItem : guestItems) {
             cartItemsService.addOrUpdateFromMainPage(
                     userid,
-                    guestItem.getProductId(),
+                    guestItem.getProductid(),
                     guestItem.getQuantity());
         }
 
-        List<CartItem> items = cartItemsService.getCartItemByUseridSorted(userid);
-
+        List<CartItem> items = cartItemsService.getCartItemByUserIdSorted(userid);
         List<CartItemResponse> response = items.stream()
                 .map(item -> new CartItemResponse(
                         item.getId(),
@@ -137,7 +116,6 @@ public class CartItemController {
                         item.getProduct().getDiscount(),
                         item.getProduct().getId()))
                 .collect(Collectors.toList());
-
         return ResponseEntity.status(200).body(response);
     }
 }

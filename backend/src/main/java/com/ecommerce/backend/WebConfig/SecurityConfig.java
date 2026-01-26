@@ -36,8 +36,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/getallproducts",
-                                "/validatetoken", "/validatetoken**", "/validatetoken/**", "/saveuser", "/products/**", "/getallcategories")
+                        // public paths without authentication
+                        .requestMatchers("/login", "/register", "/getallproducts", "/getallcategories",
+                                "/saveuser", "/products/**")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -52,7 +53,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
         // frontend origin
-        // config.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://relaxed-mermaid-700c70.netlify.app"));
+        // config.setAllowedOrigins(Arrays.asList("http://localhost:3000",
+        // "https://relaxed-mermaid-700c70.netlify.app"));
         config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*")); // allow headers

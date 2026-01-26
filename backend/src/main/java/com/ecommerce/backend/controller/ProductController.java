@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.backend.model.Product;
-import com.ecommerce.backend.services.ProductService;
+import com.ecommerce.backend.service.ProductService;
 
 @RestController
 @RequestMapping("/products") // to attach a prefix to all urls
@@ -39,13 +39,15 @@ public class ProductController {
         return ResponseEntity.status(200).body(prodService.getProductsByDiscountedPriceRange(min, max));
     }
 
+    // fetch products based on discount range
     @GetMapping("/discount")
-    public ResponseEntity<List<Product>> getProductsByDiscount(
+    public ResponseEntity<List<Product>> getProductsByDiscountRange(
             @RequestParam Integer min,
             @RequestParam(required = false) Integer max) {
         return ResponseEntity.status(200).body(prodService.getProductsByDiscountRange(min, max));
     }
 
+    // fetch products based on multiple filters
     @GetMapping("/filter")
     public ResponseEntity<List<Product>> getFilteredProducts(
             @RequestParam(required = false) Integer category,

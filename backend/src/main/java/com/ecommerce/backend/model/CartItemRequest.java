@@ -11,7 +11,7 @@ import lombok.Setter;
 @AllArgsConstructor
 // DTO for CartItemController addOrUpdateFromMain()
 public class CartItemRequest {
-    private Integer userId;
-    private Integer productId;
+    private Integer userid;
+    private Integer productid;
     private Integer quantity;
 }

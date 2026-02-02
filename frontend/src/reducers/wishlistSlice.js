@@ -20,7 +20,6 @@ export const wishlistSlice = createSlice({
     reducers: {
         setWishlist: (state, action) => {
             state.wishlist = action.payload;
-            state.wishCount = action.payload.length;
         },
         clearWishlist: (state) => {
             state.wishlist = [];
@@ -33,11 +32,9 @@ export const wishlistSlice = createSlice({
         },
         addToGuestWishlist: (state, action) => {
             state.guestWishlist.unshift(action.payload);
-            // state.wishCount = state.guestWishlist.length;
         },
         removeFromGuestWishlist: (state, action) => {
             state.guestWishlist = state.guestWishlist.filter(item => item.id !== action.payload);
-            // state.wishCount = state.guestWishlist.length;
         },
     },
 });

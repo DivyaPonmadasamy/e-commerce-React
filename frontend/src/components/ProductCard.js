@@ -7,16 +7,18 @@ import WOW from 'wowjs';
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { updateCartCount, searchInput, updateWishCount } from '../reducers/headerSlice';
-import { setLoggedIn, user, setUser } from '../reducers/loginSlice';
+import { setLoggedIn, user } from '../reducers/loginSlice';
 import {
-    products, setProducts, cart, setCart, guestCart, addToGuestCart, updateAddMore,
+    cart, setCart, guestCart, addToGuestCart, updateAddMore,
     incrementGuestCart, decrementGuestCart, removeFromGuestCart
 } from '../reducers/cartSlice';
-import { guestWishlist, setGuestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '../reducers/wishlistSlice';
+import {
+    products, setProducts,
+} from '../reducers/productSlice';
+import { guestWishlist, addToGuestWishlist, removeFromGuestWishlist } from '../reducers/wishlistSlice';
 import { calculatePrice } from '../utils/prodCardMethods';
 import Cart from './Cart';
 import AddMore from './AddMore';
-import { useAuth } from '../utils/useAuth';
 import { axiosAuth, axiosPublic } from '../configurations/axiosConfig';
 import Cookies from 'js-cookie';
 import WishList from './WishList';
@@ -34,19 +36,6 @@ export default function ProductCard() {
     const input = useSelector(searchInput);
     const dispatch = useDispatch();
     const userloc = useSelector(user);
-
-    const userauth = useAuth();
-
-    useEffect(() => {
-        if (userauth?.email && !userloc.id) {
-            // Fetch full user details from backend using email
-            axiosAuth.get(`/user/email/${userauth.email}`)
-                .then(res => {
-                    dispatch(setUser(res.data)); // sets userloc
-                    dispatch(setLoggedIn());
-                });
-        }
-    }, [userauth, userloc.id, dispatch]);
 
     // fetch products from product table and their category
     useEffect(() => {
@@ -82,54 +71,49 @@ export default function ProductCard() {
         }
     }, [localGuestWishlist, dispatch, userloc?.id]);
 
-
     // fetch cartCount from cart_item table
     const cartCount = useCallback(() => {
         axiosAuth.get(`/cart/count/${userloc.id}`)
             .then(res => dispatch(updateCartCount(res.data)));
     }, [userloc.id, dispatch]);
 
+    // function for cart_items fetch whenever reload is required
+    const reloadCart = useCallback(() => {
+        if (!userloc?.id) return;
+        axiosAuth.get(`/cart/${userloc.id}`)
+            .then(res => {
+                setLocalCart(res.data);
+                dispatch(setCart(res.data));
+                cartCount();
+            }).catch(err => console.error('reloadCart failed', err));
+    }, [userloc.id, dispatch, cartCount]);
+
     // fetch cartItems from cart_item table
     useEffect(() => {
         if (userloc.id) {
-            axiosAuth.get(`/cart/${userloc.id}`)
-                .then(res => {
-                    dispatch(setLoggedIn());
-                    dispatch(setCart(res.data));
-                    setLocalCart(res.data);
-                    cartCount();
-                });
+            dispatch(setLoggedIn());
+            reloadCart();
         }
-    }, [userloc.id, dispatch, cartCount]);
+    }, [userloc.id, dispatch, reloadCart]);
 
-    // fetch items for wishlist from wish_list table
-    useEffect(() => {
-        if (userloc.id)
+    // function for wish_list fetch whenever reload is required
+    const reloadWishList = useCallback(() => {
+        if (userloc?.id) {
             axiosAuth.get(`/wishlist/get/${userloc.id}`)
                 .then(res => {
                     setLocalWishlist(res.data);
-                    dispatch(setGuestWishlist(res.data));
+                    // dispatch(setGuestWishlist(res.data));
                     dispatch(updateWishCount(res.data.length));
-                })
-                .catch(err => console.error('reloadWishList failed', err));
+                });
+        }
     }, [userloc.id, dispatch]);
 
-    // guest cart
+    // fetch items for wishlist from wish_list table
     useEffect(() => {
-        if (!userloc?.id) {
-            setLocalCart(localGuestcart);
-            dispatch(updateCartCount(localGuestcart.length));
-        }
-    }, [localGuestcart, userloc?.id, dispatch]);
+        reloadWishList();
+    }, [reloadWishList]);
 
-    // guest wishlist
-    useEffect(() => {
-        if (!userloc?.id) {
-            setLocalWishlist(localGuestWishlist);
-            dispatch(updateWishCount(localGuestWishlist.length));
-        }
-    }, [localGuestWishlist, userloc?.id, dispatch]);
-
+    // set cart items for logged-in or guest user
     useEffect(() => {
         // if user is logged in, use the server-backed cart from redux
         if (userloc?.id) {
@@ -140,6 +124,14 @@ export default function ProductCard() {
         setLocalCart(Array.isArray(localGuestcart) ? localGuestcart : []);
         dispatch(updateCartCount(Array.isArray(localGuestcart) ? localGuestcart.length : 0));
     }, [cartItems, localGuestcart, userloc?.id, dispatch]);
+
+    // guest wishlist
+    useEffect(() => {
+        if (!userloc?.id) {
+            setLocalWishlist(localGuestWishlist);
+            dispatch(updateWishCount(localGuestWishlist.length));
+        }
+    }, [localGuestWishlist, userloc?.id, dispatch]);
 
     useEffect(() => {
         const wow = new WOW.WOW({
@@ -154,19 +146,8 @@ export default function ProductCard() {
         )
         : allProducts;
 
-    // function for cart_items fetch whenever reload is required
-    function reloadCart() {
-        if (!userloc?.id) return;
-        axiosAuth.get(`/cart/${userloc.id}`)
-            .then(res => {
-                setLocalCart(res.data);
-                dispatch(setCart(res.data));
-                cartCount();
-            }).catch(err => console.error('reloadCart failed', err));
-    }
-
     function addToCart(item) {
-        if (item.orderedquantity == 0) {
+        if (item.orderedquantity === 0) {
             toast.warn("Please select a quantity before adding!");
             return;
         }
@@ -178,10 +159,11 @@ export default function ProductCard() {
                 dispatch(updateAddMore({
                     show: true, name: item.name,
                     quantity: item.orderedquantity * item.quantity,
-                    unit: item.unit, item
+                    unit: item.unit, item: item
                 }));
                 return;
             }
+
             dispatch(addToGuestCart({
                 id: item.id, quantity: item.orderedquantity, name: item.name,
                 url: item.url, mrp: item.mrp, discount: item.discount
@@ -195,23 +177,20 @@ export default function ProductCard() {
         if (alreadyAddedIndex !== -1) {
             dispatch(updateAddMore({
                 show: true, name: item.name,
-                quantity: (item.orderedquantity * item.quantity),
+                quantity: item.orderedquantity * item.quantity,
                 unit: item.unit, item: item
             }));
             return;
         }
 
-        const cartPayload = {
-            userId: userloc.id,
-            productId: item.id,
+        axiosAuth.post('/cart', {
+            userid: userloc.id,
+            productid: item.id,
             quantity: item.orderedquantity
-        };
-
-        axiosAuth.post('/cart', cartPayload)
-            .then(() => {
-                toast.success("Item added to cart!");
-                reloadCart();
-            });
+        }).then(() => {
+            reloadCart();
+            toast.success("Item added to cart!");
+        });
     }
 
     function addMoreToCart(item) {
@@ -234,20 +213,9 @@ export default function ProductCard() {
             axiosAuth.put(`/cart/addmore/${existing.id}`, {
                 quantity: item.orderedquantity
             }).then(() => {
+                reloadCart();
+                dispatch(updateAddMore({ show: false }));
                 toast.success("Cart updated!");
-                reloadCart();
-                dispatch(updateAddMore({ show: false }));
-            }).catch(err => console.error(err));
-        } else {
-            // first time — add to cart
-            axiosAuth.post('/cart', {
-                userId: userloc.id,
-                productId: item.id,
-                quantity: item.orderedquantity
-            }).then(() => {
-                toast.success("Item added to cart!");
-                reloadCart();
-                dispatch(updateAddMore({ show: false }));
             }).catch(err => console.error(err));
         }
     }
@@ -263,11 +231,13 @@ export default function ProductCard() {
             return;
         }
 
-        // guest cart
+        // main page
         const updated = allProducts.map(item =>
             item.id === cartItemId ? { ...item, orderedquantity: item.orderedquantity + 1 } : item
         );
         dispatch(setProducts(updated));
+
+        // guest cart
         flag && dispatch(incrementGuestCart({ id: cartItemId }));
     }
 
@@ -284,11 +254,13 @@ export default function ProductCard() {
             return;
         }
 
-        // guest cart
+        // main page
         const updated = allProducts.map(item =>
             item.id === cartItemId ? { ...item, orderedquantity: Math.max(0, item.orderedquantity - 1) } : item
         );
         dispatch(setProducts(updated));
+
+        // guest cart
         const cartItem = localGuestcart.find(p => p.id === cartItemId);
 
         if (!cartItem) return;
@@ -298,7 +270,7 @@ export default function ProductCard() {
         }
     }
 
-    function deleteProd(cartItemId) {
+    function deleteFromCart(cartItemId) {
         // guest cart
         if (!userloc?.id) {
             dispatch(removeFromGuestCart(cartItemId));
@@ -318,20 +290,8 @@ export default function ProductCard() {
                             dispatch(setCart(res.data));
                             toast.info("Item removed from cart");
                         })
-                        .catch(err => console.error('fetch after delete failed', err));
-            }).catch(err => console.error('delete api failed', err));
-    }
-
-    function reloadWishList() {
-        if (userloc?.id) {
-            axiosAuth.get(`/wishlist/get/${userloc.id}`)
-                .then(res => {
-                    setLocalWishlist(res.data);
-                    dispatch(setGuestWishlist(res.data));
-                    dispatch(updateWishCount(res.data.length));
-                })
-                .catch(err => console.error('reloadWishList failed', err));
-        }
+                        .catch(err => console.error('fetch after delete cart failed', err));
+            }).catch(err => console.error('delete cart failed', err));
     }
 
     function addToWishList(item) {
@@ -350,13 +310,6 @@ export default function ProductCard() {
         }
 
         // logged-in wishlist
-        const existing = localWishlist.find(val => val.productid === item.id);
-
-        if (existing) {
-            toast.info("Already in wishlist!");
-            return;
-        }
-
         axiosAuth.post("/wishlist/add", {
             userid: userloc.id,
             productid: item.id
@@ -366,7 +319,7 @@ export default function ProductCard() {
         }).catch(err => console.error(err));
     }
 
-    function deleteFromWishlist(wishlistId) {
+    function deleteFromWishList(wishlistId) {
         // guest wishlist
         if (!userloc?.id) {
             dispatch(removeFromGuestWishlist(wishlistId));
@@ -377,15 +330,16 @@ export default function ProductCard() {
 
         // logged-in wishlist
         const updated = localWishlist.filter(item => item.id !== wishlistId);
-        toast.success("Removed from wishlist!");
         setLocalWishlist(updated);
         dispatch(updateWishCount(updated.length));
         axiosAuth.delete(`/wishlist/remove/${wishlistId}`)
-            .then(() => reloadWishList())
-            .catch(err => console.error('delete api failed', err));
+            .then(() => {
+                reloadWishList();
+                toast.success("Removed from wishlist!");
+            }).catch(err => console.error('delete wishlist failed', err));
     }
 
-    function addToCartFromWishlist(item) {
+    function addToCartFromWishList(item) {
 
         const wishlistItem = localWishlist.find(w =>
             userloc?.id ? w.productid === item.productid : w.id === item.id
@@ -428,25 +382,19 @@ export default function ProductCard() {
         }
 
         // remove from wish_list
-        // axiosAuth.delete(`/wishlist/delete/${userloc.id}/${id}`)
         axiosAuth.delete(`/wishlist/remove/${item.id}`)
             .then(() => {
                 reloadWishList();
-
                 // add to cart_item
                 axiosAuth.post('/cart', {
-                    userId: userloc.id,
-                    productId: item.productid,
+                    userid: userloc.id,
+                    productid: item.productid,
                     quantity: 1
-                })
-                    .then(() => {
-                        reloadWishList();
-                        reloadCart();
-                        toast.success("Item added to cart!");
-                    })
-                    .catch(err => console.error("Add to cart failed", err));
-            })
-            .catch(err => console.error("Wishlist delete failed", err));
+                }).then(() => {
+                    reloadCart();
+                    toast.success("Item added to cart!");
+                }).catch(err => console.error("Add to cart failed", err));
+            }).catch(err => console.error("Wishlist delete failed", err));
     }
 
     return (
@@ -464,7 +412,7 @@ export default function ProductCard() {
                                 <h3 className='category-heading'>{category.name}</h3>
                                 <div className='card-flex wow animate__animated animate__fadeInUp'>
                                     {itemsInCategory.map(item => (
-                                        <div className='card' key={item.id}>
+                                        <div key={item.id} className='card'>
                                             <div className='border rel'>
                                                 <span className='offer abs'>{`${item.discount}% OFF`}</span>
                                                 <img src={item.url} alt={item.name + '.jpeg'} />
@@ -477,9 +425,9 @@ export default function ProductCard() {
                                                         onClick={() => {
                                                             if (userloc?.id) {
                                                                 const wlItem = localWishlist.find(w => w.productid === item.id);
-                                                                if (wlItem) deleteFromWishlist(wlItem.id);
+                                                                if (wlItem) deleteFromWishList(wlItem.id);
                                                             } else {
-                                                                deleteFromWishlist(item.id);
+                                                                deleteFromWishList(item.id);
                                                             }
                                                         }}
                                                     ></i>
@@ -526,8 +474,8 @@ export default function ProductCard() {
                             &nbsp;&nbsp;Sorry, no matching products found...</p>
                     </div>
                 )}
-            <Cart product={localCart} inc={(id) => incQuantity(id, true)} dec={(id) => decQuantity(id, true)} del={(id) => deleteProd(id)} />
-            <WishList wishlist={localWishlist} addToCart={(item) => addToCartFromWishlist(item)} remove={(id) => deleteFromWishlist(id)} />
+            <Cart product={localCart} inc={(id) => incQuantity(id, true)} dec={(id) => decQuantity(id, true)} del={(id) => deleteFromCart(id)} />
+            <WishList wishlist={localWishlist} addToCart={(item) => addToCartFromWishList(item)} remove={(id) => deleteFromWishList(id)} />
             <AddMore add={(item) => addMoreToCart(item)} />
         </>
     );

@@ -10,8 +10,9 @@ import {
     searchInput, setSearch, clearSearch,
     displayLogin,
 } from '../reducers/headerSlice';
+import {clearOrderedQuantities} from '../reducers/productSlice';
 import { isLoggedIn, setLoggedOut, setUser } from "../reducers/loginSlice";
-import { setCart, clearOrderedQuantities } from '../reducers/cartSlice';
+import { setCart } from '../reducers/cartSlice';
 import { setGuestWishlist } from '../reducers/wishlistSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Login from './Login';

@@ -13,8 +13,7 @@ export function useAuth() {
         try {
             const decoded = jwtDecode(token);
             setUser({
-                email: decoded.sub, // or decoded.email if you added it as a claim
-                // Add more fields like userId, role, etc. if needed
+                email: decoded.sub, 
             });
         } catch (err) {
             console.error("Invalid token", err);

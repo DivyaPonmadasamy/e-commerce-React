@@ -14,7 +14,6 @@ try {
 export const cartSlice = createSlice({
     name: 'cart',
     initialState: {
-        products: [],
         cart: [],
         guestCart: parsedCookieCart.length ? parsedCookieCart : [],
         addMore: {
@@ -26,9 +25,6 @@ export const cartSlice = createSlice({
         },
     },
     reducers: {
-        setProducts: (state, action) => {
-            state.products = action.payload;
-        },
         setCart: (state, action) => {
             state.cart = action.payload;
         },
@@ -77,25 +73,17 @@ export const cartSlice = createSlice({
         clearGuestCart: (state) => {
             state.guestCart = [];
         },
-        clearOrderedQuantities: (state) => {
-            state.products = state.products.map(p => ({
-                ...p,
-                orderedquantity: 0
-            }));
-        },
         updateAddMore: (state, action) => {
-            const { show, name, quantity, unit } = action.payload;
+            const { show, name, quantity, unit, item } = action.payload;
             return {
                 ...state, addMore: {
                     ...state.addMore,
-                    show, name, quantity, unit, item: action.payload.item
+                    show, name, quantity, unit, item
                 }
             }
         }
     },
 });
-
-export const products = (state) => state.cart.products;
 
 export const cart = (state) => state.cart.cart;
 
@@ -104,8 +92,8 @@ export const guestCart = (state) => state.cart.guestCart;
 export const addMore = (state) => state.cart.addMore;
 
 export const {
-    setProducts, setCart, addToGuestCart, incrementGuestCart, decrementGuestCart,
-    removeFromGuestCart, clearGuestCart, clearOrderedQuantities, updateAddMore,
+    setCart, addToGuestCart, incrementGuestCart, decrementGuestCart,
+    removeFromGuestCart, clearGuestCart, updateAddMore,
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

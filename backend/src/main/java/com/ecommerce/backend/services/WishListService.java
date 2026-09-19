@@ -38,7 +38,7 @@ public class WishListService {
     }
 
     public List<WishList> getWishlistByUser(Integer userid) {
-        return wishlistRepo.findByUserId(userid); 
+        return wishlistRepo.findByUserId(userid); // ✅ fixed
     }
 
     public void removeFromWishlist(Integer wishlistid) {

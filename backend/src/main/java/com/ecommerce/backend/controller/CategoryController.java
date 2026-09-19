@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.backend.model.Category;
-import com.ecommerce.backend.service.CategoryService;
+import com.ecommerce.backend.services.CategoryService;
 
 @RestController
 public class CategoryController {

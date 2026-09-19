@@ -13,7 +13,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -26,9 +25,6 @@ public class SecurityConfig {
     @Autowired
     private JwtAuthFilter jwtAuthFilter;
 
-    @Value("${ALLOWED_ORIGINS}")
-    private String allowedOrigins;
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
@@ -36,9 +32,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .logout(logout -> logout.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // public paths without authentication
-                        .requestMatchers("/login", "/register", "/getallproducts", "/getallcategories",
-                                "/saveuser", "/products/**")
+                        .requestMatchers("/login", "/register", "/getallproducts",
+                                "/validatetoken", "/validatetoken**", "/saveuser", "/products/**", "/getallcategories")
                         .permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -48,14 +43,10 @@ public class SecurityConfig {
         // return http.build();
     }
 
-    // Bean-based config
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // frontend origin
-        // config.setAllowedOrigins(Arrays.asList("http://localhost:3000",
-        // "https://relaxed-mermaid-700c70.netlify.app"));
-        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // frontend origin
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*")); // allow headers
         config.setAllowCredentials(true); // allow cookies
